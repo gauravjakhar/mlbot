@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Bot</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f8f8;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        #chat-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .message-container {
+            overflow: hidden;
+            clear: both;
+        }
+
+        .user-message {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #aee6e6; /* Light blue */
+            text-align: right;
+            float: right;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .bot-message {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #ffd699; /* Light orange */
+            text-align: left;
+            float: left;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #chat {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 80%;
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .user-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #4caf50;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .bot-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #2196f3;
+            display: inline-block;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <h1>Ask Me!</h1>
+        <div id="chat"></div>
+        <input type="text" id="user-input" placeholder="Type your question..." onkeydown="if (event.key === 'Enter') askQuestion()">
+        <button onclick="askQuestion()">Ask</button>
+    </div>
+
+    <script>
+        function askQuestion() {
+            var userQuestion = document.getElementById("user-input").value;
+            document.getElementById("chat").innerHTML +=
+                "<div class='message-container'>" +
+                "<div class='user-message'><img class='user-icon' src='/static/user.png' alt='User Icon'><p>" + userQuestion + "</p></div>" +
+                "</div>";
+
+            // Send the question to the Flask server
+            fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: userQuestion }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                var answer = data.answer;
+                document.getElementById("chat").innerHTML +=
+                    "<div class='message-container'>" +
+                    "<div class='bot-message'><img class='bot-icon' src='/static/bot.png' alt='Bot Icon'><p>" + answer + "</p></div>" +
+                    "</div>";
+            });
+
+            // Clear input after asking
+            document.getElementById("user-input").value = "";
+        }
+    </script>
+</body>
+</html>
